@@ -3,7 +3,7 @@ const router = express.Router();
 const userController = require("../controllers/userController");
 //const ensureAuthenticated = require("../middlewares/ensureAuthenticated");
 
-router.post("/user", userController.store);
+router.post("/", userController.store);
 router.post("/tokens", userController.login);
 //router.get("/register", userController.register);
 //router.post("/users", userController.store);

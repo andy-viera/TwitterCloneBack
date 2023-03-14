@@ -1,38 +1,37 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const formidable = require("formidable");
 
 async function store(req, res) {
-  const { firstname, lastname, image, email, username, password } = req.body;
-  var token = jwt.sign({ id: "dñakfjsd" }, `${process.env.SESSION_SECRET}`);
-  // const form = formidable({
-  //   multiples: true,
-  //   uploadDir: __dirname + "/../public/img",
-  //   keepExtensions: true,
-  // });
+  const form = formidable({
+    multiples: true,
+    uploadDir: __dirname + "/../public/img",
+    keepExtensions: true,
+  });
 
-  // form.parse(req, async (err, fields, files) => {
-  //   const { firstname, lastname, email, username, password } = fields;
-  const existingEmail = await User.findOne({ email });
-  const existingUsername = await User.findOne({ username });
+  form.parse(req, async (err, fields, files) => {
+    const { firstname, lastname, email, username, password } = fields;
+    console.log(fields);
 
-  if (existingUsername || existingEmail) {
-    res.end();
-    /* req.flash("error", "You are already registered!");
-      res.redirect("/register"); */
-  } else {
-    await User.create({
-      firstname,
-      lastname,
-      email,
-      username,
-      image,
-      password: await bcrypt.hash(password, 10),
-    });
-    //     req.login(user, () => res.redirect("/"));
-  }
-  // });
-  res.send(JSON.stringify({ token: token }));
+    const existingEmail = await User.findOne({ email });
+    const existingUsername = await User.findOne({ username });
+
+    if (existingUsername || existingEmail) {
+      res.status(400).json({ error: "User already exists" });
+    } else {
+      await User.create({
+        firstname,
+        lastname,
+        email,
+        username,
+        image: files.image.newFilename,
+        password: await bcrypt.hash(password, 10),
+      });
+      var token = jwt.sign({ id: "test" }, `${process.env.SESSION_SECRET}`);
+      res.send(JSON.stringify({ token: token }));
+    }
+  });
 }
 
 async function login(req, res) {
