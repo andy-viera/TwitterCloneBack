@@ -10,11 +10,12 @@ const tweetController = require("../controllers/tweetController");
 //const ensureAuthenticated = require("../middlewares/ensureAuthenticated");
 //const ifIsProfileUser = require("../middlewares/ifIsProfileUser");
 
-router.get("/tweets", tweetController.index);
-router.get("/tweets/:id");
-router.post("/tweets");
-router.patch("/tweets:id");
-router.delete("/tweets/:id");
+router.get("/", tweetController.index);
+router.get("/:id", tweetController.indexById); // data via parameters
+router.post("/", tweetController.store); // data via request body json
+router.patch("/:id", tweetController.update); // data via request body json
+router.delete("/:id", tweetController.destroy); // data via parameters
+
 //router.post("/create-tweet", ensureAuthenticated, tweetController.store);
 /*router.delete(
   "/delete-tweet/:tweetid",
@@ -22,7 +23,6 @@ router.delete("/tweets/:id");
   ifIsProfileUser,
   tweetController.destroy,
 );*/
-
-router.get("/:tweetid/like" /*ensureAuthenticated, tweetController.like*/);
+// router.get("/:tweetid/like" /*ensureAuthenticated, tweetController.like*/);
 
 module.exports = router;

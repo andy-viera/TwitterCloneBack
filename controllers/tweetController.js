@@ -7,10 +7,18 @@ async function index(req, res) {
   return res.send(JSON.stringify({ tweets }));
 }
 
+async function indexById(req, res) {
+  const userId = req.params.id;
+  res.setHeader("Content-Type", "application/json");
+  const tweets = await Tweet.findById(userId).sort({ createdAt: -1 });
+  return res.send(JSON.stringify({ tweets }));
+}
+
 async function store(req, res) {
-  const loggedUserId = req.user._id;
+  const { loggedUserId, tweetContent } = req.body;
+
   const createdTweet = await Tweet.create({
-    content: req.body.tweetContent,
+    content: tweetContent,
     author: loggedUserId,
   });
 
@@ -18,15 +26,29 @@ async function store(req, res) {
     $push: { tweetlist: createdTweet._id },
   });
 
-  res.redirect("/");
+  return res.end();
+}
+
+async function update(req, res) {
+  const tweetId = req.params.id;
+  const tweetContent = req.body.content;
+
+  await Tweet.findByIdAndUpdate(tweetId, {
+    content: tweetContent,
+  });
+
+  return res.end();
 }
 
 async function destroy(req, res) {
-  const tweetId = req.params.tweetid;
+  const tweetId = req.params.id;
+  const { userId } = req.body;
 
   await Tweet.findByIdAndDelete(tweetId);
 
-  res.redirect(`/profile/${req.user.username}`);
+  await User.findByIdAndUpdate(userId, { $pull: { tweetlist: tweetId } });
+
+  return res.end();
 }
 
 async function like(req, res) {
@@ -44,4 +66,4 @@ async function like(req, res) {
   res.redirect(req.headers.referer || "/");
 }
 
-module.exports = { store, destroy, like, index };
+module.exports = { index, indexById, store, update, destroy, like };
