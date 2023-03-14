@@ -1,9 +1,3 @@
-/*○ [GET] /tweets
-○ [GET] /tweets/:id
-○ [POST] /tweets
-○ [PATCH] /tweets/:id
-○ [DELETE] /tweets/:id */
-
 const express = require("express");
 const router = express.Router();
 const tweetController = require("../controllers/tweetController");
