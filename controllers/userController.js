@@ -1,11 +1,10 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { expressjwt: checkJwt } = require("express-jwt");
 
 async function store(req, res) {
   const { firstname, lastname, image, email, username, password } = req.body;
-  var token = jwt.sign();
+  var token = jwt.sign({ id: "dñakfjsd" }, `${process.env.SESSION_SECRET}`);
   // const form = formidable({
   //   multiples: true,
   //   uploadDir: __dirname + "/../public/img",
@@ -33,6 +32,26 @@ async function store(req, res) {
     //     req.login(user, () => res.redirect("/"));
   }
   // });
+  res.send(JSON.stringify({ token: token }));
+}
+
+async function login(req, res) {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (user) {
+    const hash = user.password;
+    const checkPassword = await bcrypt.compare(password, hash);
+
+    if (checkPassword) {
+      var token = jwt.sign({ id: "dñakfjsd" }, `${process.env.SESSION_SECRET}`);
+      res.send(JSON.stringify({ token: token }));
+    } else {
+      console.log("Invalid credentials");
+    }
+  } else {
+    console.log("User not found");
+  }
+  res.end();
 }
 
 // async function follow(req, res) {
@@ -70,9 +89,10 @@ async function store(req, res) {
 // }
 
 module.exports = {
-  register,
+  login,
+  // register,
   store,
-  follow,
-  showFollowers,
-  showFollowing,
+  // follow,
+  // showFollowers,
+  // showFollowing,
 };

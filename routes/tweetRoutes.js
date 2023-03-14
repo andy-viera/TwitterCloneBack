@@ -7,7 +7,7 @@ const tweetController = require("../controllers/tweetController");
 router.get("/", tweetController.index);
 router.get("/:id", tweetController.indexById); // data via parameters
 router.post("/", tweetController.store); // data via request body json
-router.patch("/:id", tweetController.update); // data via request body json
+router.patch("/:id", tweetController.update); // data via request body json, data via params (id)
 router.delete("/:id", tweetController.destroy); // data via parameters
 
 //router.post("/create-tweet", ensureAuthenticated, tweetController.store);
