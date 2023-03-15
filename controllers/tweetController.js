@@ -2,6 +2,7 @@ const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 
 async function index(req, res) {
+  console.log(req.auth);
   res.setHeader("Content-Type", "application/json");
   const tweets = await Tweet.find().sort({ createdAt: -1 });
   return res.send(JSON.stringify({ tweets }));

@@ -40,13 +40,18 @@ async function store(req, res) {
 async function login(req, res) {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
+
   if (user) {
     const hash = user.password;
     const checkPassword = await bcrypt.compare(password, hash);
 
     if (checkPassword) {
-      var token = jwt.sign({ id: "dñakfjsd" }, `${process.env.SESSION_SECRET}`);
-      res.send(JSON.stringify({ token: token }));
+      var token = jwt.sign({ id: user._id }, `${process.env.SESSION_SECRET}`);
+      res.send({
+        token: token,
+        username: user.username,
+        image: user.image,
+      });
     } else {
       console.log("Invalid credentials");
     }
