@@ -12,7 +12,6 @@ async function store(req, res) {
 
   form.parse(req, async (err, fields, files) => {
     const { firstname, lastname, email, username, password } = fields;
-    console.log(fields);
 
     const existingEmail = await User.findOne({ email });
     const existingUsername = await User.findOne({ username });
@@ -20,7 +19,7 @@ async function store(req, res) {
     if (existingUsername || existingEmail) {
       res.status(400).json({ error: "User already exists" });
     } else {
-      await User.create({
+      const createdUser = await User.create({
         firstname,
         lastname,
         email,
@@ -28,8 +27,12 @@ async function store(req, res) {
         image: files.image.newFilename,
         password: await bcrypt.hash(password, 10),
       });
-      var token = jwt.sign({ id: "test" }, `${process.env.SESSION_SECRET}`);
-      res.send(JSON.stringify({ token: token }));
+      var token = jwt.sign({ userId: createdUser._id }, `${process.env.SESSION_SECRET}`);
+      res.send({
+        token: token,
+        username: createdUser.username,
+        image: createdUser.image,
+      });
     }
   });
 }
@@ -88,9 +91,9 @@ async function login(req, res) {
 // }
 
 module.exports = {
+  store,
   login,
   // register,
-  store,
   // follow,
   // showFollowers,
   // showFollowing,
