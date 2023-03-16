@@ -49,6 +49,9 @@ async function login(req, res) {
       var token = jwt.sign({ id: user._id }, `${process.env.SESSION_SECRET}`);
       res.send({
         token: token,
+        id: user._id,
+        firstname: user.firstname,
+        lastname: user.lastname,
         username: user.username,
         image: user.image,
       });
