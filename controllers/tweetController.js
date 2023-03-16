@@ -2,17 +2,26 @@ const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 
 async function index(req, res) {
-  console.log(req.auth);
-  res.setHeader("Content-Type", "application/json");
-  const tweets = await Tweet.find().sort({ createdAt: -1 });
-  return res.send(JSON.stringify({ tweets }));
+  const user = await User.findById(req.auth.id);
+  console.log("user", user);
+  const tweets = await Tweet.find({ author: { $in: [...user.following, user] } })
+    .limit(20)
+    .sort({ createdAt: -1 })
+    .populate({
+      path: "author",
+      select: "_id firstname lastname username email image",
+    });
+  res.json(tweets);
+  //const tweets = await Tweet.find();
+  //res.json(tweets);
+  //console.log(tweets);
 }
 
 async function indexById(req, res) {
   const userId = req.params.id;
-  res.setHeader("Content-Type", "application/json");
   const tweets = await Tweet.findById(userId).sort({ createdAt: -1 });
-  return res.send(JSON.stringify({ tweets }));
+  console.log(tweets);
+  return res.json(tweets);
 }
 
 async function store(req, res) {
