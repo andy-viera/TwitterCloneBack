@@ -3,7 +3,6 @@ const User = require("../models/User");
 
 async function index(req, res) {
   const user = await User.findById(req.auth.id);
-  console.log("user", user);
   const tweets = await Tweet.find({ author: { $in: [...user.following, user] } })
     .limit(20)
     .sort({ createdAt: -1 })
@@ -20,7 +19,6 @@ async function index(req, res) {
 async function indexById(req, res) {
   const userId = req.params.id;
   const tweets = await Tweet.findById(userId).sort({ createdAt: -1 });
-  console.log(tweets);
   return res.json(tweets);
 }
 
