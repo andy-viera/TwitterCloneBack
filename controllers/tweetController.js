@@ -2,6 +2,7 @@ const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 
 async function index(req, res) {
+  // console.log(req.auth);
   const user = await User.findById(req.auth.id);
   const tweets = await Tweet.find({ author: { $in: [...user.following, user] } })
     .limit(20)
@@ -17,7 +18,7 @@ async function index(req, res) {
 }
 
 async function indexById(req, res) {
-  console.log(req.auth);
+  // console.log(req.auth);
   const user = await User.findById(req.auth.id);
   const tweets = await Tweet.find({ author: { $in: [user] } })
     .sort({ createdAt: -1 })
@@ -33,19 +34,17 @@ async function indexById(req, res) {
 
 async function store(req, res) {
   const tweetContent = req.body.content;
-  const loggedUserId = req.body.loggedUser.id;
+  const loggedUserId = req.auth.id;
 
   const createdTweet = await Tweet.create({
     content: tweetContent,
     author: loggedUserId,
   });
-
+  console.log(createdTweet);
   await User.findByIdAndUpdate(loggedUserId, {
     $push: { tweetlist: createdTweet },
   });
-
-  console.log("prueba", loggedUserId);
-  return res.end();
+  return res.json(createdTweet);
 }
 
 async function update(req, res) {

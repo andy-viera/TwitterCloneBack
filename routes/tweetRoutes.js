@@ -4,7 +4,6 @@ const tweetController = require("../controllers/tweetController");
 const { expressjwt: checkJwt } = require("express-jwt");
 //const ensureAuthenticated = require("../middlewares/ensureAuthenticated");
 //const ifIsProfileUser = require("../middlewares/ifIsProfileUser");
-
 router.get(
   "/",
   checkJwt({ secret: process.env.SESSION_SECRET, algorithms: ["HS256"] }),
