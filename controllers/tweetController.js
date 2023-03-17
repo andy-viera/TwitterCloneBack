@@ -18,18 +18,12 @@ async function index(req, res) {
 }
 
 async function indexById(req, res) {
-  // console.log(req.auth);
-  const user = await User.findById(req.auth.id);
-  const tweets = await Tweet.find({ author: { $in: [user] } })
-    .sort({ createdAt: -1 })
-    .populate({
-      path: "author",
-      select: "_id firstname lastname username email image",
-    });
-  res.json(tweets);
-  //const tweets = await Tweet.find();
-  //res.json(tweets);
-  //console.log(tweets);
+  const user = await User.findById(req.params.id).select("-password -_id").exec();
+  const tweets = await Tweet.find({ author: { $in: [user] } }).sort({ createdAt: -1 });
+  res.json({
+    tweets,
+    user,
+  });
 }
 
 async function store(req, res) {
@@ -40,7 +34,7 @@ async function store(req, res) {
     content: tweetContent,
     author: loggedUserId,
   });
-  console.log(createdTweet);
+
   await User.findByIdAndUpdate(loggedUserId, {
     $push: { tweetlist: createdTweet },
   });
