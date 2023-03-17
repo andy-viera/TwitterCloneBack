@@ -17,7 +17,11 @@ router.get(
   tweetController.indexById,
 ); // data via parameters
 
-router.post("/", tweetController.store); // data via request body json
+router.post(
+  "/",
+  checkJwt({ secret: process.env.SESSION_SECRET, algorithms: ["HS256"] }),
+  tweetController.store,
+); // data via request body json
 
 router.patch("/:id", tweetController.update); // data via request body json, data via params (id)
 

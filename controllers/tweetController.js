@@ -17,6 +17,7 @@ async function index(req, res) {
 }
 
 async function indexById(req, res) {
+  console.log(req.auth);
   const user = await User.findById(req.auth.id);
   const tweets = await Tweet.find({ author: { $in: [user] } })
     .sort({ createdAt: -1 })
@@ -31,7 +32,8 @@ async function indexById(req, res) {
 }
 
 async function store(req, res) {
-  const { loggedUserId, tweetContent } = req.body;
+  const tweetContent = req.body.content;
+  const loggedUserId = req.body.loggedUser.id;
 
   const createdTweet = await Tweet.create({
     content: tweetContent,
@@ -39,9 +41,10 @@ async function store(req, res) {
   });
 
   await User.findByIdAndUpdate(loggedUserId, {
-    $push: { tweetlist: createdTweet._id },
+    $push: { tweetlist: createdTweet },
   });
 
+  console.log("prueba", loggedUserId);
   return res.end();
 }
 
