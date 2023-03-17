@@ -17,9 +17,17 @@ async function index(req, res) {
 }
 
 async function indexById(req, res) {
-  const userId = req.params.id;
-  const tweets = await Tweet.findById(userId).sort({ createdAt: -1 });
-  return res.json(tweets);
+  const user = await User.findById(req.auth.id);
+  const tweets = await Tweet.find({ author: { $in: [user] } })
+    .sort({ createdAt: -1 })
+    .populate({
+      path: "author",
+      select: "_id firstname lastname username email image",
+    });
+  res.json(tweets);
+  //const tweets = await Tweet.find();
+  //res.json(tweets);
+  //console.log(tweets);
 }
 
 async function store(req, res) {
