@@ -86,11 +86,16 @@ async function login(req, res) {
 //   res.redirect(req.headers.referer || "/");
 // }
 
-// async function showFollowers(req, res) {
-//   const username = req.params.username;
-//   const userFollowers = await User.findOne({ username }).populate("followers");
-//   res.render("pages/followers", { userFollowers });
-// }
+async function showFollowers(req, res) {
+  // console.log(req.params.username); Esta mostrando el username correctame
+  const username = req.params.username;
+  const { userFollowers } = await User.findOne({ username }).populate({
+    path: "followers",
+    select: "firstname lastname username image",
+  });
+  console.log("prueba", userFollowers);
+  return res.json(userFollowers);
+}
 
 // async function showFollowing(req, res) {
 //   const username = req.params.username;
@@ -103,6 +108,6 @@ module.exports = {
   login,
   // register,
   // follow,
-  // showFollowers,
+  showFollowers,
   // showFollowing,
 };

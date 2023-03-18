@@ -2,7 +2,6 @@ const Tweet = require("../models/Tweet");
 const User = require("../models/User");
 
 async function index(req, res) {
-  // console.log(req.auth);
   const user = await User.findById(req.auth.id);
   const tweets = await Tweet.find({ author: { $in: [...user.following, user] } })
     .limit(20)
@@ -12,20 +11,12 @@ async function index(req, res) {
       select: "_id firstname lastname username email image",
     });
   return res.json(tweets);
-  //const tweets = await Tweet.find();
-  //res.json(tweets);
-  //console.log(tweets);
 }
 
 async function indexById(req, res) {
-  console.log("aaa");
   const userId = req.params.id;
-  console.log(userId);
-
   const user = await User.findById(userId).select("-password -_id").exec();
   const tweets = await Tweet.find({ author: { $in: [userId] } }).sort({ createdAt: -1 });
-
-  console.log(user);
 
   return res.json({
     tweets,
