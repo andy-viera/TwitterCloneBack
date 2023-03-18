@@ -11,16 +11,23 @@ async function index(req, res) {
       path: "author",
       select: "_id firstname lastname username email image",
     });
-  res.json(tweets);
+  return res.json(tweets);
   //const tweets = await Tweet.find();
   //res.json(tweets);
   //console.log(tweets);
 }
 
 async function indexById(req, res) {
-  const user = await User.findById(req.params.id).select("-password -_id").exec();
-  const tweets = await Tweet.find({ author: { $in: [user] } }).sort({ createdAt: -1 });
-  res.json({
+  console.log("aaa");
+  const userId = req.params.id;
+  console.log(userId);
+
+  const user = await User.findById(userId).select("-password -_id").exec();
+  const tweets = await Tweet.find({ author: { $in: [userId] } }).sort({ createdAt: -1 });
+
+  console.log(user);
+
+  return res.json({
     tweets,
     user,
   });
