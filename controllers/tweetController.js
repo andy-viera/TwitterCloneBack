@@ -15,7 +15,7 @@ async function index(req, res) {
 
 async function indexById(req, res) {
   const userId = req.params.id;
-  const user = await User.findById(userId).select("-password -_id").exec();
+  const user = await User.findById(userId).select("-password -email").exec();
   const tweets = await Tweet.find({ author: { $in: [userId] } }).sort({ createdAt: -1 });
 
   return res.json({

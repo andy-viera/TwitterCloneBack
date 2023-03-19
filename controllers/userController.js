@@ -87,14 +87,16 @@ async function login(req, res) {
 // }
 
 async function showFollowers(req, res) {
-  // console.log(req.params.username); Esta mostrando el username correctame
-  const username = req.params.username;
-  const { userFollowers } = await User.findOne({ username }).populate({
-    path: "followers",
-    select: "firstname lastname username image",
-  });
-  console.log("prueba", userFollowers);
-  return res.json(userFollowers);
+  const userId = req.params.id;
+  const user = await User.findById(userId)
+    .select("-password")
+    .populate({
+      path: "followers",
+      select: "firstname lastname username image",
+    })
+    .exec();
+
+  return res.json(user);
 }
 
 // async function showFollowing(req, res) {
