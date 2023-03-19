@@ -22,17 +22,14 @@ router.post(
   tweetController.store,
 ); // data via request body json
 
-router.patch("/:id", tweetController.update); // data via request body json, data via params (id)
+router.patch("/:id/edit", tweetController.update); // data via request body json, data via params (id)
 
 router.delete("/:id", tweetController.destroy); // data via parameters
 
-//router.post("/create-tweet", ensureAuthenticated, tweetController.store);
-/*router.delete(
-  "/delete-tweet/:tweetid",
-  ensureAuthenticated,
-  ifIsProfileUser,
-  tweetController.destroy,
-);*/
-// router.get("/:tweetid/like" /*ensureAuthenticated, tweetController.like*/);
+router.patch(
+  "/:id/like",
+  checkJwt({ secret: process.env.SESSION_SECRET, algorithms: ["HS256"] }),
+  tweetController.like,
+);
 
 module.exports = router;

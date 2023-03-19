@@ -30,6 +30,9 @@ async function store(req, res) {
       var token = jwt.sign({ userId: createdUser._id }, `${process.env.SESSION_SECRET}`);
       res.send({
         token: token,
+        id: createdUser.username._id,
+        firstname: createdUser.firstname,
+        lastname: uscreatedUserer.lastname,
         username: createdUser.username,
         image: createdUser.image,
       });

@@ -62,8 +62,8 @@ async function destroy(req, res) {
 }
 
 async function like(req, res) {
-  const tweetId = req.params.tweetid;
-  const loggedUserId = req.user._id;
+  const tweetId = req.params.id;
+  const loggedUserId = req.auth.id;
   const tweet = await Tweet.findById(tweetId);
   const likes = tweet.likes;
   const likeIndex = likes.indexOf(loggedUserId);
@@ -73,7 +73,8 @@ async function like(req, res) {
     likes.splice(likeIndex, 1);
   }
   await tweet.save();
-  res.redirect(req.headers.referer || "/");
+
+  return res.json(likes);
 }
 
 module.exports = { index, indexById, store, update, destroy, like };
