@@ -11,5 +11,10 @@ router.get(
   checkJwt({ secret: process.env.SESSION_SECRET, algorithms: ["HS256"] }),
   userController.showFollowers,
 );
+router.get(
+  "/:id/followings",
+  checkJwt({ secret: process.env.SESSION_SECRET, algorithms: ["HS256"] }),
+  userController.showFollowing,
+);
 
 module.exports = router;
