@@ -102,11 +102,18 @@ async function showFollowers(req, res) {
   return res.json(user);
 }
 
-// async function showFollowing(req, res) {
-//   const username = req.params.username;
-//   const userFollowing = await User.findOne({ username }).populate("following");
-//   res.render("pages/following", { userFollowing });
-// }
+async function showFollowing(req, res) {
+  const userId = req.params.id;
+  const user = await User.findById(userId)
+    .select("-password")
+    .populate({
+      path: "following",
+      select: "firstname lastname username image",
+    })
+    .exec();
+
+  return res.json(user);
+}
 
 module.exports = {
   store,
@@ -114,5 +121,5 @@ module.exports = {
   // register,
   // follow,
   showFollowers,
-  // showFollowing,
+  showFollowing,
 };
