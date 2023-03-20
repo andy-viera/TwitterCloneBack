@@ -19,7 +19,7 @@ async function store(req, res) {
     if (existingUsername || existingEmail) {
       res.status(400).json({ error: "User already exists" });
     } else {
-      const createdUser = await User.create({
+      await User.create({
         firstname,
         lastname,
         email,
@@ -27,17 +27,7 @@ async function store(req, res) {
         image: files.image.newFilename,
         password: await bcrypt.hash(password, 10),
       });
-      var token = jwt.sign({ userId: createdUser._id }, `${process.env.SESSION_SECRET}`);
-      res.send({
-        token: token,
-        id: createdUser.username._id,
-        firstname: createdUser.firstname,
-        lastname: createdUser.lastname,
-        followers: createdUser.followers,
-        following: createdUser.following,
-        username: createdUser.username,
-        image: createdUser.image,
-      });
+      res.end();
     }
   });
 }
@@ -124,10 +114,17 @@ async function showFollowing(req, res) {
   return res.json(user);
 }
 
+async function whoToFollow(req, res) {
+  const users = await User.find().select("username firstname lastname image id").limit(5).lean();
+
+  return res.json(users);
+}
+
 module.exports = {
   store,
   login,
   follow,
   showFollowers,
   showFollowing,
+  whoToFollow,
 };

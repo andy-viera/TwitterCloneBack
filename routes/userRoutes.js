@@ -23,4 +23,10 @@ router.patch(
   userController.follow,
 );
 
+router.get(
+  "/who-to-follow",
+  checkJwt({ secret: process.env.SESSION_SECRET, algorithms: ["HS256"] }),
+  userController.whoToFollow,
+);
+
 module.exports = router;
