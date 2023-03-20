@@ -32,7 +32,9 @@ async function store(req, res) {
         token: token,
         id: createdUser.username._id,
         firstname: createdUser.firstname,
-        lastname: uscreatedUserer.lastname,
+        lastname: createdUser.lastname,
+        followers: createdUser.followers,
+        following: createdUser.following,
         username: createdUser.username,
         image: createdUser.image,
       });
@@ -55,6 +57,8 @@ async function login(req, res) {
         id: user._id,
         firstname: user.firstname,
         lastname: user.lastname,
+        followers: user.followers,
+        following: user.following,
         username: user.username,
         image: user.image,
       });
@@ -67,27 +71,32 @@ async function login(req, res) {
   res.end();
 }
 
-// async function follow(req, res) {
-//   const userId = req.params.userid;
-//   const loggedUserId = req.user._id;
-//   const user = await User.findById(userId);
-//   const followers = user.followers;
-//   const following = req.user.following;
-//   const followerIndex = followers.indexOf(loggedUserId);
-//   const followingIndex = following.indexOf(userId);
+async function follow(req, res) {
+  const userId = req.params.id;
+  const loggedUserId = req.auth.id;
 
-//   if (followerIndex === -1) {
-//     followers.push(loggedUserId);
-//     following.push(userId);
-//   } else {
-//     followers.splice(followerIndex, 1);
-//     following.splice(followingIndex, 1);
-//   }
-//   await user.save();
-//   await req.user.save();
+  const user = await User.findById(userId);
+  const loggedUser = await User.findById(loggedUserId);
 
-//   res.redirect(req.headers.referer || "/");
-// }
+  const userFollowers = user.followers;
+  const loggedUserFollowing = loggedUser.following;
+  const followerIndex = userFollowers.indexOf(loggedUserId);
+  const followingIndex = loggedUserFollowing.indexOf(userId);
+
+  if (followerIndex === -1) {
+    userFollowers.push(loggedUserId);
+    loggedUserFollowing.push(userId);
+  } else {
+    userFollowers.splice(followerIndex, 1);
+    loggedUserFollowing.splice(followingIndex, 1);
+  }
+  await user.save();
+  await loggedUser.save();
+
+  return res.json({
+    followingList: loggedUserFollowing,
+  });
+}
 
 async function showFollowers(req, res) {
   const userId = req.params.id;
@@ -118,8 +127,7 @@ async function showFollowing(req, res) {
 module.exports = {
   store,
   login,
-  // register,
-  // follow,
+  follow,
   showFollowers,
   showFollowing,
 };
