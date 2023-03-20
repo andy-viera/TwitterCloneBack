@@ -24,7 +24,11 @@ router.post(
 
 router.patch("/:id/edit", tweetController.update); // data via request body json, data via params (id)
 
-router.delete("/:id", tweetController.destroy); // data via parameters
+router.delete(
+  "/:id",
+  checkJwt({ secret: process.env.SESSION_SECRET, algorithms: ["HS256"] }),
+  tweetController.destroy,
+); // data via parameters
 
 router.patch(
   "/:id/like",

@@ -52,11 +52,13 @@ async function update(req, res) {
 
 async function destroy(req, res) {
   const tweetId = req.params.id;
-  const { userId } = req.body;
+  const loggedUserId = req.auth.id;
+  const tweet = await Tweet.findById(tweetId);
 
-  await Tweet.findByIdAndDelete(tweetId);
-
-  await User.findByIdAndUpdate(userId, { $pull: { tweetlist: tweetId } });
+  if (tweet.author.toString() === loggedUserId) {
+    await Tweet.findByIdAndDelete(tweetId);
+    await User.findByIdAndUpdate(loggedUserId, { $pull: { tweetlist: tweetId } });
+  }
 
   return res.end();
 }
