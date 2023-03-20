@@ -68,24 +68,28 @@ async function follow(req, res) {
   const user = await User.findById(userId);
   const loggedUser = await User.findById(loggedUserId);
 
-  const userFollowers = user.followers;
-  const loggedUserFollowing = loggedUser.following;
-  const followerIndex = userFollowers.indexOf(loggedUserId);
-  const followingIndex = loggedUserFollowing.indexOf(userId);
-
-  if (followerIndex === -1) {
-    userFollowers.push(loggedUserId);
-    loggedUserFollowing.push(userId);
+  if (userId === loggedUserId) {
+    res.end();
   } else {
-    userFollowers.splice(followerIndex, 1);
-    loggedUserFollowing.splice(followingIndex, 1);
-  }
-  await user.save();
-  await loggedUser.save();
+    const userFollowers = user.followers;
+    const loggedUserFollowing = loggedUser.following;
+    const followerIndex = userFollowers.indexOf(loggedUserId);
+    const followingIndex = loggedUserFollowing.indexOf(userId);
 
-  return res.json({
-    followingList: loggedUserFollowing,
-  });
+    if (followerIndex === -1) {
+      userFollowers.push(loggedUserId);
+      loggedUserFollowing.push(userId);
+    } else {
+      userFollowers.splice(followerIndex, 1);
+      loggedUserFollowing.splice(followingIndex, 1);
+    }
+    await user.save();
+    await loggedUser.save();
+
+    return res.json({
+      followingList: loggedUserFollowing,
+    });
+  }
 }
 
 async function showFollowers(req, res) {
@@ -115,9 +119,20 @@ async function showFollowing(req, res) {
 }
 
 async function whoToFollow(req, res) {
-  const users = await User.find().select("username firstname lastname image id").limit(5).lean();
+  const loggedUserId = req.auth.id;
+  const allUsers = await User.find().select("-password");
 
-  return res.json(users);
+  const filteredUsers = allUsers.filter((user) => {
+    return user._id.toString() !== loggedUserId;
+  });
+  const whoToFollow = [];
+
+  for (let i = 1; whoToFollow.length <= 4; i++) {
+    const randomUser = filteredUsers[Math.floor(Math.random() * (filteredUsers.length - 1 + 1))];
+    if (!whoToFollow.includes(randomUser)) whoToFollow.push(randomUser);
+  }
+
+  return res.json(whoToFollow);
 }
 
 module.exports = {
