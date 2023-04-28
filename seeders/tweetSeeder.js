@@ -36,3 +36,4 @@ module.exports = async () => {
 
   await Tweet.insertMany(tweets);
 };
+console.log("[Database] Se corrió el seeder de Tweets.");
